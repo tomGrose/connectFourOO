@@ -4,12 +4,18 @@
  * column until a player gets four-in-a-row (horiz, vert, or diag) or until
  * board fills (tie)
  */
-
+class Player {
+  constructor(playerNum, playerColor) {
+    this.playerNum = playerNum;
+    this.playerColor = playerColor;
+  }
+}
 class Game {
-  constructor(WIDTH, HEIGHT){
+  constructor(WIDTH, HEIGHT, player1, player2){
+    this.players = [player1, player2]
     this.WIDTH = 7;
     this.HEIGHT = 6;
-    this.currPlayer = 1;
+    this.currPlayer = player1;
     this.makeBoard();
     this.makeHtmlBoard();
   }
@@ -66,7 +72,7 @@ class Game {
   placeInTable(y, x) {
     const piece = document.createElement('div');
     piece.classList.add('piece');
-    piece.classList.add(`p${this.currPlayer}`);
+    piece.style.backgroundColor = this.currPlayer.playerColor;
     piece.style.top = -50 * (y + 2);
   
     const spot = document.getElementById(`${y}-${x}`);
@@ -78,6 +84,11 @@ class Game {
   }
 
   handleClick(evt) {
+  //Check to see if game is over, if so don't allow any more pieces to drop.
+  if (this.checkForWin()) {
+    return this.endGame(`Player ${this.currPlayer.playerNum} already won!`);
+  }
+
     // get x from ID of clicked cell
     const x = +evt.target.id;
   
@@ -93,7 +104,7 @@ class Game {
     
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${this.currPlayer} won!`);
+      return this.endGame(`Player ${this.currPlayer.playerNum} won!`);
     }
     
     // check for tie
@@ -102,7 +113,7 @@ class Game {
     }
       
     // switch players
-    this.currPlayer = this.currPlayer === 1 ? 2 : 1;
+    this.currPlayer = this.currPlayer === this.players[0] ? this.players[1] : this.players[0];
   }
 
   checkForWin() {
@@ -140,6 +151,11 @@ class Game {
 }
 
 document.querySelector('#startButton').addEventListener('click', () => {
-  const newGame = new Game(6, 7);
+  const player1Color = document.querySelector('#player1').value;
+  const player2Color = document.querySelector('#player2').value;
+  const player1 = new Player(1, player1Color.toLowerCase()); 
+  const player2 = new Player(2, player2Color.toLowerCase()); 
+  const NewGame = new Game(6, 7, player1, player2);
+  
 })
 
